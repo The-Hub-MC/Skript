@@ -1,0 +1,271 @@
+#
+#Title: SkStats
+#Version: 1.0
+#Author: MinePlugins
+#
+# IMPORTANT MYSQL A MODIFIER
+script options:
+    $ db url jdbc:mysql://198.23.144.115:3306/mc_67920
+    $ db username mc_67920
+    $ db password 2vyat0iq
+
+options:
+	table_prefix: Stats_
+	refresh: 300
+On load:
+	if {Stats-Reloader} is set:
+		set {_period} to difference between {Stats-Reload-sec} and now
+		send "&9SkStats >>  &7The skript have been reload in &a%{_period}%" to {Stats-Reloader}
+		clear {Stats-Reloader}
+command /stats [<text=help>] [<text>]:
+	permission: SkStats.commands.player
+	trigger:
+		if arg-1 is "help":
+			send "&9&lâ•”&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&9&l[ &6&lStats &9&l]&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•—"
+			send "   &bPlayer commands:"
+			send "    &9/Stats Check &7Check your stats"
+			send "    &9/Stats Player <Player> &7Check stats of player"
+			send "    &9/Stats top <Type>&7 Check the top player"
+			if player have permission "SkStats.commands.admin":
+				send "   &cAdmin commands:"
+				send "    &9/Stats Purge &7Purge the mysql and variable stats"
+				send "    &9/Stats Sync &7Sync the stats with the database"
+				send "    &9/Stats Reload &7Reload the skript"
+		if arg-1 is "check":
+			send "&9&lâ•”&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&9&l[ &6&lStats &9&l]&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•—"
+			send "  &bYour stats:"
+			send "    &3First join: &7%{newfirstjoin-%player%}%"
+			send "    &3Kills: &7%{newkills-%player%}%"
+			send "    &3Deaths: &7%{newdeaths-%player%}%"
+			send "    &3Projectile shoot: &7%{newshoot-%player%}%"
+			send "    &3Kills with bow: &7%{newkillsbow-%player%}%"
+			send "    &3Block destroyed: &7%{newbreak-%player%}%"
+			send "    &3Block placed: &7%{newplace-%player%}%"
+			send "    &3Messages: &7%{newmessages-%player%}%"
+			send "    &3Commands: &7%{newcommands-%player%}%"
+			send "    &3Meter walk: &7%{newwalk-%player%}%"
+		if arg 1 is "reload":
+			set {Stats-Reload-sec} to now
+			set {Stats-Reloader} to player
+			make console execute command "/skript reload SkStats"
+		if arg-1 is "player":
+			if arg-2 is not set:
+				send  "&9SkStats >> &cYou don't have specified the username of player !"
+			else:
+				if {firstjoin-%arg-2%} is not set:
+					send "&9SkStats >> &cThe player has never join the server !"
+				else:
+					send "&9&lâ•”&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&9&l[ &6&lStats &9&l]&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•—"
+					send "  &bPlayer: &7%arg-2%"
+					send "    &3First join: &7%{firstjoin-%arg-2%}%"
+					send "    &3Kills: &7%{kills-%arg-2%}%"
+					send "    &3Deaths: &7%{deaths-%arg-2%}%"
+					send "    &3Projectile shoot: &7%{shoot-%arg-2%}%"
+					send "    &3Kills with bow:&7 %{killsbow-%arg-2%}%"
+					send "    &3Block destroyed: &7%{break-%arg-2%}%"
+					send "    &3Block placed:&7 %{place-%arg-2%}%"
+					send "    &3Messages: &7%{messages-%arg-2%}%"
+					send "    &3Commands: &7%{commands-%arg-2%}%"
+					send "    &3Meter walk: &7%{walk-%arg-2%}%"
+		if arg-1 is "purge":
+			if player have permission "SkStats.commands.purge":
+				loop {statslistplayer::*}:
+					set {deaths-%loop-value%} to 0
+					set {kills-%loop-value%} to 0
+					set {break-%loop-value%} to 0
+					set {place-%loop-value%} to 0
+					set {killsbow-%loop-value%} to 0
+					set {shoot-%loop-value%} to 0
+					set {walk-%loop-value%} to 0
+					set {messages-%loop-value%} to 0
+					set {commands-%loop-value%} to 0		
+					set {newdeaths-%loop-value%} to 0
+					set {newkills-%loop-value%} to 0
+					set {newbreak-%loop-value%} to 0
+					set {newplace-%loop-value%} to 0
+					set {newkillsbow-%loop-value%} to 0
+					set {newshoot-%loop-value%} to 0
+					set {newwalk-%loop-value%} to 0
+					set {newmessages-%loop-value%} to 0
+					set {newcommands-%loop-value%} to 0						
+				update "TRUNCATE TABLE `{@table_prefix}Player`"
+		if arg-1 is "sync":
+			if player have permission "SkStats.commands.sync":
+				loop all players:
+					update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Deaths` = `Deaths`+%{deaths-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+					update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Kills` = `Kills`+%{kills-%loop-player%}% WHERE `Player`.`{@table_prefix}Player` = '%loop-player%'"
+					update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Breaks` = `Breaks`+%{break-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+					update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Placed` = `Placed`+%{place-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+					update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`BowKills` = `BowKills`+%{killsbow-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+					update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Shoot` = `Shoot`+%{shoot-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+					update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Walk` = `Walk`+%{walk-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+					update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Messages` = `Messages`+%{messages-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+					update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Commands` = `Commands`+%{commands-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+					set {newdeaths-%loop-player%} to {newdeaths-%loop-player%} + {deaths-%loop-player%}
+					set {newkills-%loop-player%} to {newkills-%loop-player%} + {kills-%loop-player%}
+					set {newbreak-%loop-player%} to {newbreak-%loop-player%} + {break-%loop-player%}
+					set {newplace-%loop-player%} to {newplace-%loop-player%} + {place-%loop-player%}
+					set {newkillsbow-%loop-player%} to {newkillsbow-%loop-player%} + {killsbow-%loop-player%}
+					set {newshoot-%loop-player%} to {newshoot-%loop-player%} + {shoot-%loop-player%}
+					set {newwalk-%loop-player%} to {newwalk-%loop-player%} + {walk-%loop-player%}
+					set {newmessages-%loop-player%} to {newmessages-%loop-player%} + {messages-%loop-player%}
+					set {newcommands-%loop-player%} to {newcommands-%loop-player%} + {commands-%loop-player%} 
+					set {deaths-%loop-player%} to 0
+					set {kills-%loop-player%} to 0
+					set {break-%loop-player%} to 0
+					set {place-%loop-player%} to 0
+					set {killsbow-%loop-player%} to 0
+					set {shoot-%loop-player%} to 0
+					set {walk-%loop-player%} to 0
+					set {messages-%loop-player%} to 0
+					set {commands-%loop-player%} to 0	
+				send "&9SkStats >>  &aThe stats have been synced with the mysql database"
+		if arg-1 is "top":
+			if arg-2 is not set:
+				send "&9SkStats >> &cYou don't have selected the top type &7(&eKills&7,&eDeaths&7,&eBreaks&7,&ePlaced&7,&eBowKills&7,&eShoot&7,&eWalk&7,&eMessages&7,&eCommands&7)"
+			else if arg-2 is not "kills" or "deaths" or "breaks" or "placed" or "bowkills" or "shoot" or "walk" or "messages" or "commands":
+				send "&9SkStats >> &cYou don't have selected the good top type &7(&eKills&7,&eDeaths&7,&eBreaks&7,&ePlaced&7,&eBowKills&7,&eShoot&7,&eWalk&7,&eMessages&7,&eCommands&7)"
+			else:
+				set {_stats0::*} to objects in column "Player" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 0"
+				set {_stats1::*} to objects in column "Player" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 1"
+				set {_stats2::*} to objects in column "Player" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 2"
+				set {_stats3::*} to objects in column "Player" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 3"
+				set {_stats4::*} to objects in column "Player" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 4"
+				set {_stats5::*} to objects in column "Player" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 5"
+				set {_stats6::*} to objects in column "Player" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 6"
+				set {_stats7::*} to objects in column "Player" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 7"
+				set {_stats8::*} to objects in column "Player" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 8"
+				set {_stats9::*} to objects in column "Player" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 9"
+				set {_statsn0::*} to objects in column "%arg-2%" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 0"
+				set {_statsn1::*} to objects in column "%arg-2%" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 1"
+				set {_statsn2::*} to objects in column "%arg-2%" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 2"
+				set {_statsn3::*} to objects in column "%arg-2%" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 3"
+				set {_statsn4::*} to objects in column "%arg-2%" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 4"
+				set {_statsn5::*} to objects in column "%arg-2%" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 5"
+				set {_statsn6::*} to objects in column "%arg-2%" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 6"
+				set {_statsn7::*} to objects in column "%arg-2%" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 7"
+				set {_statsn8::*} to objects in column "%arg-2%" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 8"
+				set {_statsn9::*} to objects in column "%arg-2%" from result of query "SELECT * FROM `{@table_prefix}Player` ORDER BY `%arg-2%` DESC LIMIT 1 OFFSET 9"
+				send "&9&lâ•”&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&l[ &6&lTop %arg-2% &9&l]&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•&3&lâ•&9&lâ•—"
+				send "&b      Rank &8&m|&r &bPlayer &8&m|&r &bStats"
+				Send "&e      1er &8&m-&r &7%{_stats0::*}% &c%{_statsn0::*}%"
+				Send "&7      2nd &8&m-&r &7%{_stats1::*}% &c%{_statsn1::*}%"
+				Send "&6      3eme &8&m-&r &7%{_stats2::*}% &c%{_statsn2::*}%"
+				Send "&3      4 &8&m-&r &7%{_stats3::*}% &c%{_statsn3::*}%"
+				Send "&3      5 &8&m-&r &7%{_stats4::*}% &c%{_statsn4::*}%"
+				Send "&3      6 &8&m-&r &7%{_stats5::*}%&c %{_statsn5::*}%"
+				Send "&3      7 &8&m-&r &7%{_stats6::*}% &c%{_statsn6::*}%"
+				Send "&3      8 &8&m-&r &7%{_stats7::*}% &c%{_statsn7::*}%"
+				Send "&3      9 &8&m-&r &7%{_stats8::*}% &c%{_statsn8::*}%"
+				Send "&3      10 &8&m-&r &7%{_stats9::*}%&c %{_statsn9::*}%"
+				send "&b      Rank &9&m|&r &bPlayer &9&m|&r &bStats"			
+On script load:
+	update "CREATE TABLE IF NOT EXISTS `{@table_prefix}Player` (`Player` varchar(255),`Kills` varchar(255),`Deaths` varchar(255),`Breaks` varchar(255),`Placed` varchar(255),`FirstJoin` varchar(255),`BowKills` varchar(255),`Shoot` varchar(255),`Walk` varchar(255),`Messages` varchar(255),`Commands` varchar(255))"
+On join:
+	if {firstjoin-%player%} is not set:
+		set {deaths-%player%} to 0
+		set {kills-%player%} to 0
+		set {break-%player%} to 0
+		set {place-%player%} to 0
+		set {killsbow-%player%} to 0
+		set {shoot-%player%} to 0
+		set {walk-%player%} to 0
+		set {messages-%player%} to 0
+		set {commands-%player%} to 0
+		set {newdeaths-%player%} to 0
+		set {newkills-%player%} to 0
+		set {newbreak-%player%} to 0
+		set {newplace-%player%} to 0
+		set {newkillsbow-%player%} to 0
+		set {newshoot-%player%} to 0
+		set {newwalk-%player%} to 0
+		set {newmessages-%player%} to 0
+		set {newcommands-%player%} to 0
+		add player to {statslistplayer::*}
+		set {firstjoin-%player%} to "%now%"
+		update "INSERT INTO `{@table_prefix}Player` (`Player`, `Kills`, `Deaths`, `Breaks`, `Placed`, `FirstJoin`, `BowKills`, `Shoot`, `Walk`, `Messages`, `Commands`) VALUES ('%player%', '0', '0', '0', '0', '%now%', '0', '0', '0', '0', '0')"
+On death:
+	attacker is player
+	victim is player
+	add 1 to {deaths-%victim%}
+	add 1 to {kills-%attacker%}
+On shoot:
+	player is shooter
+	add 1 to {shoot-%shooter%}
+On death:
+	attacker is shooter
+	attacker is player
+	add 1 to {killsbow-%attacker%}
+On break:
+	add 1 to {break-%player%}
+On place:
+	add 1 to {place-%player%}
+On chat:
+	add 1 to {messages-%player%}
+On command:
+	add 1 to {commands-%player%}
+every 5 ticks:
+	loop all players:
+		if {walk-%loop-player%-loc} is not set:
+			set {walk-%loop-player%-loc} to location of block below loop-player
+			add 1 to {walk-%loop-player%}
+		else if {walk-%loop-player%-loc} is not location of block below loop-player:
+			set {walk-%loop-player%-loc} to location of block below loop-player
+			add 1 to {walk-%loop-player%}
+every {@refresh} seconds:
+	loop all players:
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Deaths` = `Deaths`+%{deaths-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Kills` = `Kills`+%{kills-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Breaks` = `Breaks`+%{break-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Placed` = `Placed`+%{place-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`BowKills` = `BowKills`+%{killsbow-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Shoot` = `Shoot`+%{shoot-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Walk` = `Walk`+%{walk-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Messages` = `Messages`+%{messages-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Commands` = `Commands`+%{commands-%loop-player%}% WHERE `{@table_prefix}Player`.`Player` = '%loop-player%'"
+		set {newdeaths-%loop-player%} to {newdeaths-%loop-player%} + {deaths-%loop-player%}
+		set {newkills-%loop-player%} to {newkills-%loop-player%} + {kills-%loop-player%}
+		set {newbreak-%loop-player%} to {newbreak-%loop-player%} + {break-%loop-player%}
+		set {newplace-%loop-player%} to {newplace-%loop-player%} + {place-%loop-player%}
+		set {newkillsbow-%loop-player%} to {newkillsbow-%loop-player%} + {killsbow-%loop-player%}
+		set {newshoot-%loop-player%} to {newshoot-%loop-player%} + {shoot-%loop-player%}
+		set {newwalk-%loop-player%} to {newwalk-%loop-player%} + {walk-%loop-player%}
+		set {newmessages-%loop-player%} to {newmessages-%loop-player%} + {messages-%loop-player%}
+		set {newcommands-%loop-player%} to {newcommands-%loop-player%} + {commands-%loop-player%} 
+		set {deaths-%loop-player%} to 0
+		set {kills-%loop-player%} to 0
+		set {break-%loop-player%} to 0
+		set {place-%loop-player%} to 0
+		set {killsbow-%loop-player%} to 0
+		set {shoot-%loop-player%} to 0
+		set {walk-%loop-player%} to 0
+		set {messages-%loop-player%} to 0
+		set {commands-%loop-player%} to 0
+On quit:
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Deaths` = `Deaths`+%{deaths-%player%}% WHERE `{@table_prefix}Player`.`Player` = '%player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Kills` = `Kills`+%{kills-%player%}% WHERE `{@table_prefix}Player`.`Player` = '%player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Breaks` = `Breaks`+%{break-%player%}% WHERE `{@table_prefix}Player`.`Player` = '%player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Placed` = `Placed`+%{place-%player%}% WHERE `{@table_prefix}Player`.`Player` = '%player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`BowKills` = `BowKills`+%{killsbow-%player%}% WHERE `{@table_prefix}Player`.`Player` = '%player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Shoot` = `Shoot`+%{shoot-%player%}% WHERE `{@table_prefix}Player`.`Player` = '%player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Walk` = `Walk`+%{walk-%player%}% WHERE `{@table_prefix}Player`.`Player` = '%player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Messages` = `Messages`+%{messages-%player%}% WHERE `{@table_prefix}Player`.`Player` = '%player%'"
+		update "UPDATE `{@table_prefix}Player` SET `{@table_prefix}Player`.`Commands` = `Commands`+%{commands-%player%}% WHERE `{@table_prefix}Player`.`Player` = '%player%'"
+		set {newdeaths-%player%} to {newdeaths-%player%} + {deaths-%player%}
+		set {newkills-%player%} to {newkills-%player%} + {kills-%player%}
+		set {newbreak-%player%} to {newbreak-%player%} + {break-%player%}
+		set {newplace-%player%} to {newplace-%player%} + {place-%player%}
+		set {newkillsbow-%player%} to {newkillsbow-%player%} + {killsbow-%player%}
+		set {newshoot-%player%} to {newshoot-%player%} + {shoot-%player%}
+		set {newwalk-%player%} to {newwalk-%player%} + {walk-%player%}
+		set {newmessages-%player%} to {newmessages-%player%} + {messages-%player%}
+		set {newcommands-%player%} to {newcommands-%player%} + {commands-%player%} 
+		set {deaths-%player%} to 0
+		set {kills-%player%} to 0
+		set {break-%player%} to 0
+		set {place-%player%} to 0
+		set {killsbow-%player%} to 0
+		set {shoot-%player%} to 0
+		set {walk-%player%} to 0
+		set {messages-%player%} to 0
+		set {commands-%player%} to 0
